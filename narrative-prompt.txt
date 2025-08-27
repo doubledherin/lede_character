@@ -1,0 +1,62 @@
+ABSOLUTE REQUIREMENT: Generate a COMPLETE 2,500-3,000 word interactive narrative in the 2nd person. This is NOT a summary or outline - write the FULL story with all sections and endings.
+
+You are creating a deeply emotional, cinematic choose-your-own-adventure experience based on this news article about autocracy/democracy decline.
+
+MANDATORY LENGTH: 2,500-3,000 words minimum. Each section must be 200-300 words of detailed prose.
+
+Article Title: {{title}}
+Article Description: {{description}}
+Article URL: {{url}}
+
+STRUCTURE REQUIREMENTS:
+Create a COMPLETE branching narrative with:
+- 12-15 story sections minimum
+- EXACTLY 10 TOTAL DECISION POINTS that the reader must make
+- Multiple branching paths that reconverge and branch again
+- 3-4 different COMPLETE ENDINGS (not just more choices)
+- Each ending should be 300+ words showing the final consequences
+
+DECISION STRUCTURE:
+The reader must make approximately 10 choices total across their journey:
+- Choices 1-3: Early setup and character establishment
+- Choices 4-6: Rising tension and conflict escalation  
+- Choices 7-9: Crisis moments and moral dilemmas
+- Choice 10: Final decisive action leading to ending
+
+GROUNDING REQUIREMENTS:
+Start immediately with:
+- EXACT LOCATION: Specific country, city, building
+- PRECISE TIME: Date, time of day, current events
+- MAIN CHARACTER (2nd person) IDENTITY: Name, age, job, family, personal stakes
+- IMMEDIATE SITUATION: What specific crisis they face
+
+ENDINGS REQUIREMENT:
+Each story path must lead to a COMPLETE ENDING that shows:
+- The final outcome of the character's choices
+- Emotional resolution (triumph, tragedy, bittersweet victory)
+- Concrete consequences in their world
+- How their actions affected others
+
+Write sections with rich dialogue, detailed descriptions, and emotional depth.
+
+SAMPLE FORMAT STRUCTURE:
+Section 1: [Detailed opening scene - 250+ words]
+→ Choice 1: Option A / Option B
+
+Section 2A: [Consequence of Choice 1A - 250+ words]
+→ Choice 2: Option A / Option B
+
+Section 2B: [Consequence of Choice 1B - 250+ words]  
+→ Choice 3: Option A / Option B
+
+Section 3A: [Consequence of Choice 2A - 250+ words]
+→ Choice 4: Option A / Option B
+
+[Continue this pattern through approximately 10 total choices]
+
+Section 10A: [Final choice leads to ENDING 1 - 300+ words]
+Section 10B: [Final choice leads to ENDING 2 - 300+ words]
+Section 10C: [Final choice leads to ENDING 3 - 300+ words]
+Section 10D: [Final choice leads to ENDING 4 - 300+ words]
+
+CRITICAL: You must write ALL sections and ALL endings. The reader should encounter exactly 10 decision points before reaching their final ending. DO NOT STOP until you have written complete endings for all story branches.

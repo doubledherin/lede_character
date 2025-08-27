@@ -1,13 +1,13 @@
 require("dotenv").config()
 
-async function getNews() {
+async function getRecentArticles() {
   const apiKey = process.env.NEWS_API_KEY
   if (!apiKey) {
     throw new Error("Missing NEWS_API_KEY environment variable")
   }
-  const query = "autocracy OR antidemocratic OR fascist OR fascism"
+  const query =
+    'autocracy OR autocratic OR antidemocratic OR fascist OR fascism OR far-right OR "far right" OR authoritarian OR authoritarianism OR dictatorship OR totalitarianism OR populism OR populist OR demagogue OR demagoguery OR demagogy OR demagogic OR autocrat OR autocratic OR despotism OR despot OR tyrant OR tyranny'
   const fromDate = new Date()
-  // fromDate.setDate(fromDate.getDate() - 3)
   fromDate.setMonth(fromDate.getMonth() - 1)
   const from = fromDate.toISOString().split("T")[0]
 
@@ -22,4 +22,5 @@ async function getNews() {
   const data = await response.json()
   return data
 }
-module.exports = getNews
+
+module.exports = getRecentArticles

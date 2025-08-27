@@ -59,7 +59,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 To fetch and display news articles:
 
 ```bash
-node runGetNews.js
+node rungetRecentArticles.js
 ```
 
 ### Generate Narrative Analysis
@@ -82,9 +82,9 @@ This will:
 lede_character/
 ├── .env                 # Environment variables (not committed)
 ├── .gitignore          # Git ignore rules
-├── getNews.js          # News fetching functionality
+├── getRecentArticles.js          # News fetching functionality
 ├── openAI.js           # OpenAI integration and main analysis
-├── runGetNews.js       # Script to test news fetching
+├── rungetRecentArticles.js       # Script to test news fetching
 ├── package.json        # Project dependencies
 └── README.md          # This file
 ```

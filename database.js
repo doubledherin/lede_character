@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3").verbose()
 const path = require("path")
 
-const dbPath = path.join(__dirname, "narrative_analysis.db")
+const dbPath = path.join(__dirname, "lede_character.db")
 const db = new sqlite3.Database(dbPath)
 
 db.serialize(() => {
@@ -11,6 +11,16 @@ db.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       total_articles INTEGER,
       accepted_articles INTEGER
+    )
+  `)
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS narratives (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      article_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      narrative_text TEXT,
+      FOREIGN KEY (article_id) REFERENCES articles (id)
     )
   `)
 
@@ -44,7 +54,6 @@ function saveAnalysisRun(totalArticles, acceptedArticles) {
 
       const runId = this.lastID
 
-      // Now save the articles with this run_id
       const articleStmt = db.prepare(`
         INSERT INTO articles (run_id, title, description, url, author, published_at, source)
         VALUES (?, ?, ?, ?, ?, ?, ?)

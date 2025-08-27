@@ -1,6 +1,6 @@
 require("dotenv").config()
 
-const getNews = require("./getNews")
+const getRecentArticles = require("./getRecentArticles")
 const { saveAnalysisRun } = require("./database")
 
 function extractJSONFromMarkdown(text) {
@@ -14,12 +14,19 @@ function extractJSONFromMarkdown(text) {
 }
 
 async function main() {
-  const data = await getNews()
-  const articles = data.articles.slice(0, 20)
+  const data = await getRecentArticles()
+  const articles = data.articles.slice(0, 50)
 
   const prompt = `
 You are an expert narrative designer. 
 Below is a list of recent news articles about the rise of autocracy and/or the decline of democracy.
+
+
+Tasks:
+1. IMPORTANT: Reject articles centered on fictional content (movies, books, etc.)
+2. Reject articles not focused on autocracy or decline of democracy
+3. Select the best 10 articles for choose-your-own-adventure narrative
+4. For each selected article, provide a brief description and a narrative feasibility rating (high, medium, low)
 
 IMPORTANT: Respond with ONLY a valid JSON object, no markdown formatting, no code blocks.
 
@@ -34,14 +41,11 @@ The JSON should have this exact structure:
       "author": "Author Name",
       "publishedAt": "2023-01-01T00:00:00Z",
       "source": "Source Name"
+      "narrativeFeasibility": "high" // or "medium", "low"
     }
   ]
 }
 
-Tasks:
-1. Reject articles focused on fictional content (movies, books, etc.)
-2. Reject articles not focused on autocracy or decline of democracy
-3. Select the best 5 articles for choose-your-own-adventure narrative
 
 Articles:
 ${articles
@@ -73,11 +77,8 @@ ${articles
     throw new Error("No response from AI")
   }
 
-  console.log("Raw AI reply:", reply)
-
   // Extract JSON from markdown if needed
   const cleanedReply = extractJSONFromMarkdown(reply)
-  console.log("Cleaned reply:", cleanedReply)
 
   // Parse the JSON response
   let analysis
@@ -87,26 +88,17 @@ ${articles
     throw new Error("Failed to parse AI response as JSON: " + error.message)
   }
 
-  console.log("Parsed analysis:", analysis)
   // Filter only accepted articles
   const acceptedArticles = articles.filter((article, index) =>
     analysis.acceptedArticles.some((accepted) => accepted.index === index + 1)
   )
 
-  console.log(
-    `Filtered ${acceptedArticles.length} accepted articles from ${articles.length} total`
-  )
+  console.log("Accepted Articles 0:", acceptedArticles[0])
 
   // Save to database with analysis run tracking
   try {
     const runId = await saveAnalysisRun(articles.length, acceptedArticles)
     console.log(`\nAnalysis run saved with ID: ${runId}`)
-    console.log(
-      `Acceptance rate: ${(
-        (acceptedArticles.length / articles.length) *
-        100
-      ).toFixed(1)}%`
-    )
   } catch (error) {
     console.error("Error saving to database:", error)
   }
