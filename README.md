@@ -80,13 +80,21 @@ This will:
 
 ```
 lede_character/
-├── .env                 # Environment variables (not committed)
-├── .gitignore          # Git ignore rules
-├── getRecentArticles.js          # News fetching functionality
-├── openAI.js           # OpenAI integration and main analysis
-├── rungetRecentArticles.js       # Script to test news fetching
-├── package.json        # Project dependencies
-└── README.md          # This file
+
+├── curateArticles.js     # Curates and filters news articles
+├── database.js           # Handles SQLite database
+
+operations
+├── generateNarrative.js  # Generates narrative suggestions
+
+using OpenAI
+├── getRecentArticles.js  # Fetches recent news articles
+├── lede_character.db     # SQLite database file
+├── narrative-prompt.txt  # Prompt template for narrative
+
+generation
+├── package.json          # Project dependencies and scripts
+└── README.md             # Documentation
 ```
 
 ## API Configuration

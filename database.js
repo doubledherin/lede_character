@@ -8,7 +8,7 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS analysis_runs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
       total_articles INTEGER,
       accepted_articles INTEGER
     )
@@ -18,7 +18,7 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS narratives (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       article_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
       narrative_text TEXT,
       FOREIGN KEY (article_id) REFERENCES articles (id)
     )
@@ -34,6 +34,7 @@ db.serialize(() => {
       author TEXT,
       published_at TEXT,
       source TEXT,
+      created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
       FOREIGN KEY (run_id) REFERENCES analysis_runs (id)
     )
   `)

@@ -93,8 +93,6 @@ ${articles
     analysis.acceptedArticles.some((accepted) => accepted.index === index + 1)
   )
 
-  console.log("Accepted Articles 0:", acceptedArticles[0])
-
   // Save to database with analysis run tracking
   try {
     const runId = await saveAnalysisRun(articles.length, acceptedArticles)
