@@ -2,7 +2,6 @@ const sqlite3 = require("sqlite3").verbose()
 const fs = require("fs").promises
 const path = require("path")
 const readline = require("readline")
-require("dotenv").config()
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 const DB_PATH = "./lede_character.db"

@@ -1,0 +1,29 @@
+You are an expert narrative designer. 
+Below is a list of recent news articles about the rise of autocracy and/or the decline of democracy.
+
+Tasks:
+1. IMPORTANT: Reject articles centered on fictional content (movies, books, etc.)
+2. Reject articles not focused on autocracy or decline of democracy
+3. Select the best 10 articles for choose-your-own-adventure narrative
+4. For each selected article, provide a brief description and a narrative feasibility rating (high, medium, low)
+
+IMPORTANT: Respond with ONLY a valid JSON object, no markdown formatting, no code blocks.
+
+The JSON should have this exact structure:
+{
+  "acceptedArticles": [
+    {
+      "index": 2,
+      "title": "Article title",
+      "description": "Brief description of the article",
+      "url": "https://example.com/article-url",
+      "author": "Author Name",
+      "publishedAt": "2023-01-01T00:00:00Z",
+      "source": "Source Name",
+      "narrativeFeasibility": "high"
+    }
+  ]
+}
+
+Articles:
+{{articles}}
