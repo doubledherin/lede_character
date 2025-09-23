@@ -4,7 +4,7 @@ AI-powered immersive journalism platform that uses OpenAI GPT-4 and ElevenLabs A
 
 ## Overview
 
-This project combines news aggregation with AI-powered narrative analysis to create immersive, audio-driven interactive fiction based on real news events.
+This project combines news aggregation with AI-powered narrative analysis, text-to-speech, and sound-effect generation to create immersive, audio-driven interactive fiction based on real news events.
 
 ### Current Implementation:
 
