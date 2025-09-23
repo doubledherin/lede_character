@@ -191,6 +191,7 @@ The application searches for articles using these keywords:
 lede_character/
 ├── .env                    # Environment variables (not committed)
 ├── .gitignore             # Git ignore rules
+├── LICENSE                # MIT License
 ├── main.js               # Main analysis pipeline
 ├── helpers.js            # Core utility functions
 ├── database.js           # Database operations and schema
