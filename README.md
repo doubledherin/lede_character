@@ -11,6 +11,9 @@ This project combines news aggregation with AI-powered narrative analysis to:
 3. Store accepted articles in a SQLite database with analysis run tracking
 4. Generate detailed, branching choose-your-own-adventure narratives based on real news events
 
+To come: 5. Store the narratives in a NoSQL DB 6. Provide a user-facing prompt for selecting a story to play 7. Use ElevenLabs APIs to generate voices and sound effects for the narratives.
+More details to come.
+
 ## Features
 
 - **Smart Incremental Fetching**: Only fetches articles newer than the last analysis run
@@ -44,25 +47,17 @@ cd lede_character
 npm install sqlite3 dotenv node-cron
 ```
 
-3. Create a `.env` file in the root directory:
+3. Get your API keys:
+
+   - **NewsAPI**: Sign up at [newsapi.org](https://newsapi.org/) for a free API key
+   - **OpenAI**: Get your API key from [platform.openai.com](https://platform.openai.com/)
+
+4. Create a `.env` file in the root directory:
 
 ```env
 NEWS_API_KEY=your_newsapi_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 ```
-
-4. Get your API keys:
-
-   - **NewsAPI**: Sign up at [newsapi.org](https://newsapi.org/) for a free API key
-   - **OpenAI**: Get your API key from [platform.openai.com](https://platform.openai.com/)
-
-5. Create the curation prompt template:
-
-```bash
-touch curation-prompt.txt
-```
-
-Add your curation prompt template to this file (see template format below).
 
 ## Usage
 
