@@ -1,6 +1,6 @@
 # Lede Character
 
-This is an immersive-journalism Node.js app uses OpenAI and ElevenLabs APIs to generate audioscapes of choose your own adventure–style narratives based on real news related to the worldwide decline of democracy.
+This is a Node.js immersive-journalism app that uses OpenAI and ElevenLabs APIs to generate interactive, audio-driven choose-your-own-adventure narratives grounded in real news about the global decline of democracy.
 
 ## Overview
 
