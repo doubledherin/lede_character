@@ -26,10 +26,10 @@ This project combines news aggregation with AI-powered narrative analysis to cre
 
 ### Planned Features:
 
-5. **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
-6. **Interactive Playback**: Command-line and web interfaces for users to experience the stories
-7. **Session Management**: Track user progress, choices, and story completion
-8. **Cost Optimization**: Smart caching and cost tracking for API usage
+- **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
+- **Interactive Playback**: Command-line and web interfaces for users to experience the stories
+- **Session Management**: Track user progress, choices, and story completion
+- **Cost Optimization**: Smart caching and cost tracking for API usage
 
 The end goal is a fully immersive audio experience where users can select from curated news-based narratives, make choices at decision points, and experience branching storylines with professional voice acting and atmospheric sound design.
 
