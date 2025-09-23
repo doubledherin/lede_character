@@ -1,10 +1,8 @@
 # Lede Character
 
-AI-powered immersive journalism platform that uses OpenAI GPT-4 and ElevenLabs APIs to transform real news about democracy's decline into interactive, audio-driven choose-your-own-adventure narratives.
-
 ## Overview
 
-This project combines news aggregation with AI-powered narrative analysis, text-to-speech, and sound-effect generation to create immersive, audio-driven interactive fiction based on real news events.
+This project is an AI-powered immersive journalism platform that uses OpenAI GPT-4 and ElevenLabs APIs to transform real news about democracy's decline into interactive, audio-driven choose-your-own-adventure narratives.
 
 ### Current Implementation:
 
