@@ -354,14 +354,109 @@ node generateNarrative.js <article_id>
 
 [Add your license information here]
 
-## Future Enhancements
+## Future Development Roadmap
 
-- [ ] Web interface for narrative browsing and management
-- [ ] Audio generation integration for voice narratives
-- [ ] Multiple news source aggregation (Guardian, Reuters APIs)
-- [ ] Narrative rating and feedback system
-- [ ] Export to Twine, Ink, or other interactive fiction formats
-- [ ] Character illustration generation with DALL-E
-- [ ] Advanced analytics dashboard for article trends
-- [ ] Webhook integration for real-time article processing
-- [ ] Multi-language support for international news sources
+Based on the current codebase, here's a comprehensive checklist of remaining features to implement:
+
+### Phase 1: Core Pipeline Completion
+
+- [ ] **Add `saveAnalysisRun` function** to database.js for storing analysis results
+- [ ] **Implement narrative generation workflow** (currently exists as separate script)
+- [ ] **Add error handling and retry logic** for API failures
+- [ ] **Create daily automation script** with cron job scheduling
+- [ ] **Add logging system** for monitoring pipeline runs
+- [ ] **Implement duplicate narrative prevention** with user confirmation prompts
+
+### Phase 2: Interactive User Interface
+
+- [ ] **Build command-line interface** for selecting narratives
+- [ ] **Create user session tracking** (which narrative, current position, choices made)
+- [ ] **Implement branching logic parser** to navigate story decision points
+- [ ] **Add user progress persistence** between sessions
+- [ ] **Build narrative completion tracking**
+
+### Phase 3: Audio Integration (ElevenLabs)
+
+- [ ] **Research ElevenLabs API** and pricing structure
+- [ ] **Set up ElevenLabs account** and obtain API credentials
+- [ ] **Design audio generation strategy**:
+  - [ ] Generate entire narrative upfront vs. on-demand
+  - [ ] Segment narratives for optimal audio chunks
+  - [ ] Handle choice prompts and branching audio
+- [ ] **Implement audio synthesis pipeline**
+- [ ] **Add sound effects integration** for immersive experience
+- [ ] **Create audio file storage system** (local files vs. cloud storage)
+- [ ] **Build audio playback interface**
+
+### Phase 4: Cost Management & Optimization
+
+- [ ] **Add API cost tracking tables** to database schema
+- [ ] **Implement cost logging** for OpenAI and ElevenLabs calls
+- [ ] **Create budget monitoring** and alert system
+- [ ] **Add audio caching logic** to prevent duplicate generation
+- [ ] **Build cost analytics dashboard** for spending insights
+- [ ] **Implement usage optimization** (batch processing, smart caching)
+
+### Phase 5: Data Management & Quality
+
+- [ ] **Add data validation** for article content quality
+- [ ] **Implement narrative quality scoring** and feedback
+- [ ] **Create database backup and migration scripts**
+- [ ] **Add article source diversification** beyond NewsAPI
+- [ ] **Build content moderation** for inappropriate narratives
+- [ ] **Add narrative versioning** for iterative improvements
+
+### Phase 6: Advanced Features
+
+- [ ] **Web-based interface** for better user experience
+- [ ] **Multi-user support** with user accounts and preferences
+- [ ] **Narrative sharing and rating system**
+- [ ] **Advanced analytics** on user choices and story paths
+- [ ] **Integration with other story formats** (Twine, Ink, etc.)
+- [ ] **Mobile app development** for audio narrative consumption
+- [ ] **AI voice cloning** for consistent character voices
+- [ ] **Dynamic story adaptation** based on user choices over time
+
+### Phase 7: Production & Deployment
+
+- [ ] **Environment configuration** (dev/staging/production)
+- [ ] **Cloud deployment setup** (AWS/GCP/Azure)
+- [ ] **CI/CD pipeline** for automated testing and deployment
+- [ ] **Performance monitoring** and error tracking
+- [ ] **Security hardening** and API key management
+- [ ] **Documentation completion** for contributors
+- [ ] **User onboarding and tutorial system**
+
+### Phase 8: Business & Scale
+
+- [ ] **Usage analytics** and user behavior tracking
+- [ ] **Content recommendation engine** based on user preferences
+- [ ] **Subscription or monetization model**
+- [ ] **Content partnerships** with news organizations
+- [ ] **Accessibility features** for users with disabilities
+- [ ] **Internationalization** for multiple languages
+- [ ] **Performance optimization** for large-scale usage
+
+### Technical Debt & Maintenance
+
+- [ ] **Add comprehensive unit tests** for all functions
+- [ ] **Implement integration tests** for full pipeline
+- [ ] **Add TypeScript** for better type safety
+- [ ] **Refactor code organization** into proper modules
+- [ ] **Add configuration management** for different environments
+- [ ] **Implement proper logging framework** (Winston, etc.)
+- [ ] **Add health checks** and monitoring endpoints
+
+### Current Priorities (Recommended Next Steps)
+
+1. ✅ **Complete database functions** (`saveAnalysisRun`, etc.)
+2. ✅ **Test full pipeline** from articles → narratives → database
+3. **Research ElevenLabs integration** and create proof-of-concept
+4. **Build simple CLI for narrative selection** and playback
+5. **Add basic cost tracking** when audio features are implemented
+
+---
+
+**Total estimated development time**: 6-12 months for full implementation, depending on scope and complexity of audio features.
+
+**Immediate next sprint** (1-2 weeks): Focus on completing Phase 1 to have a fully functional text-based narrative generation pipeline.
