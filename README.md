@@ -13,7 +13,7 @@ This project combines news aggregation with AI-powered narrative analysis to cre
 3. Store accepted articles in a SQLite database with analysis run tracking
 4. Generate detailed, branching choose-your-own-adventure narratives based on real news events
 
-###Current Features
+### Current Features
 
 - **Smart Incremental Fetching**: Only fetches articles newer than the last analysis run
 - **AI Analysis**: Uses OpenAI's GPT-4 to evaluate narrative potential and filter articles
