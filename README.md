@@ -4,17 +4,25 @@ This is a Node.js immersive-journalism app that uses OpenAI and ElevenLabs APIs 
 
 ## Overview
 
-This project combines news aggregation with AI-powered narrative analysis to:
+This project combines news aggregation with AI-powered narrative analysis to create immersive, audio-driven interactive fiction based on real news events.
+
+### Current Implementation:
 
 1. Fetch recent news articles about autocracy, fascism, and antidemocratic movements
-2. Analyze which articles would make compelling interactive fiction
+2. Analyze which articles would make compelling interactive fiction using OpenAI's GPT-4
 3. Store accepted articles in a SQLite database with analysis run tracking
 4. Generate detailed, branching choose-your-own-adventure narratives based on real news events
 
-To come: 5. Store the narratives in a NoSQL DB 6. Provide a user-facing prompt for selecting a story to play 7. Use ElevenLabs APIs to generate voices and sound effects for the narratives.
-More details to come.
+### Planned Features:
 
-## Features
+5. **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
+6. **Interactive Playback**: Command-line and web interfaces for users to experience the stories
+7. **Session Management**: Track user progress, choices, and story completion
+8. **Cost Optimization**: Smart caching and cost tracking for API usage
+
+The end goal is a fully immersive audio experience where users can select from curated news-based narratives, make choices at decision points, and experience branching storylines with professional voice acting and atmospheric sound design.
+
+## Current Features
 
 - **Smart Incremental Fetching**: Only fetches articles newer than the last analysis run
 - **AI Analysis**: Uses OpenAI's GPT-4 to evaluate narrative potential and filter articles
