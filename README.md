@@ -65,13 +65,6 @@ NEWS_API_KEY=your_newsapi_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-## Environment Variables
-
-| Variable         | Description                                 | Required |
-| ---------------- | ------------------------------------------- | -------- |
-| `NEWS_API_KEY`   | Your NewsAPI key for fetching articles      | Yes      |
-| `OPENAI_API_KEY` | Your OpenAI API key for analysis/narratives | Yes      |
-
 ## Usage
 
 ### 1. Run Full Analysis Pipeline
