@@ -13,16 +13,7 @@ This project combines news aggregation with AI-powered narrative analysis to cre
 3. Store accepted articles in a SQLite database with analysis run tracking
 4. Generate detailed, branching choose-your-own-adventure narratives based on real news events
 
-### Planned Features:
-
-5. **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
-6. **Interactive Playback**: Command-line and web interfaces for users to experience the stories
-7. **Session Management**: Track user progress, choices, and story completion
-8. **Cost Optimization**: Smart caching and cost tracking for API usage
-
-The end goal is a fully immersive audio experience where users can select from curated news-based narratives, make choices at decision points, and experience branching storylines with professional voice acting and atmospheric sound design.
-
-## Current Features
+###Current Features
 
 - **Smart Incremental Fetching**: Only fetches articles newer than the last analysis run
 - **AI Analysis**: Uses OpenAI's GPT-4 to evaluate narrative potential and filter articles
@@ -32,6 +23,15 @@ The end goal is a fully immersive audio experience where users can select from c
 - **Overwrite Protection**: Prevents accidental narrative overwrites with confirmation prompts
 - **Template-Based Prompts**: Modular prompt system using external text files
 - **Daily Automation**: Built-in cron job support for automated daily processing
+
+### Planned Features:
+
+5. **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
+6. **Interactive Playback**: Command-line and web interfaces for users to experience the stories
+7. **Session Management**: Track user progress, choices, and story completion
+8. **Cost Optimization**: Smart caching and cost tracking for API usage
+
+The end goal is a fully immersive audio experience where users can select from curated news-based narratives, make choices at decision points, and experience branching storylines with professional voice acting and atmospheric sound design.
 
 ## Prerequisites
 
