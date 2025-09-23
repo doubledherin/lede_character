@@ -20,10 +20,10 @@ This project is an AI-powered immersive journalism platform that uses OpenAI GPT
 - **Narrative Generation**: Creates 2,500-3,000 word interactive stories with 10 decision points
 - **Overwrite Protection**: Prevents accidental narrative overwrites with confirmation prompts
 - **Template-Based Prompts**: Modular prompt system using external text files
-- **Daily Automation**: Built-in cron job support for automated daily processing
 
 ### Planned Features:
 
+- **Daily Automation**: Built-in cron job support for automated daily processing
 - **Audio Integration**: Use ElevenLabs APIs to generate professional voice narration and sound effects
 - **Interactive Playback**: Command-line and web interfaces for users to experience the stories
 - **Session Management**: Track user progress, choices, and story completion
@@ -64,6 +64,13 @@ npm install sqlite3 dotenv node-cron
 NEWS_API_KEY=your_newsapi_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 ```
+
+## Environment Variables
+
+| Variable         | Description                                 | Required |
+| ---------------- | ------------------------------------------- | -------- |
+| `NEWS_API_KEY`   | Your NewsAPI key for fetching articles      | Yes      |
+| `OPENAI_API_KEY` | Your OpenAI API key for analysis/narratives | Yes      |
 
 ## Usage
 
@@ -120,129 +127,27 @@ This starts a cron job that runs daily at 6 AM and:
 4. Generates narratives for all new articles
 5. Logs all activities for monitoring
 
-### 4. View Database Contents
+## Database
 
-Use [DB Browser for SQLite](https://sqlitebrowser.org/) to explore your data:
-
-1. Open DB Browser for SQLite
-2. Open `lede_character.db`
-3. Browse the `analysis_runs`, `articles`, and `narratives` tables
-
-## Configuration
-
-### Curation Prompt Template
-
-Create a `curation-prompt.txt` file with your AI curation instructions. Example structure:
-
-```text
-You are an expert narrative designer analyzing news articles.
-
-Tasks:
-1. Reject articles centered on fictional content
-2. Reject articles not focused on autocracy or democracy decline
-3. Select the best 10 articles for choose-your-own-adventure narratives
-
-Respond with ONLY valid JSON:
-{
-  "acceptedArticles": [
-    {
-      "index": 1,
-      "title": "Article title",
-      "description": "Brief description"
-    }
-  ]
-}
-
-Articles:
-{{articles}}
-```
-
-### NewsAPI Search Query
-
-The application searches for articles using these keywords:
-
-- autocracy, autocratic, antidemocratic
-- fascist, fascism, far-right
-- authoritarian, authoritarianism
-- dictatorship, totalitarianism
-- populism, populist, demagogue
-- despotism, despot, tyrant, tyranny
-
-## Database Schema
-
-### analysis_runs
-
-- `id`: Primary key
-- `created_at`: ISO 8601 timestamp with Z suffix (UTC)
-- `total_articles`: Number of articles analyzed
-- `accepted_articles`: Number of articles accepted for narratives
-
-### articles
-
-- `id`: Primary key
-- `run_id`: Foreign key to analysis_runs
-- `title`, `description`, `url`, `author`, `published_at`, `source`: Article metadata
-- `created_at`: ISO 8601 timestamp with Z suffix (UTC)
-
-### narratives
-
-- `id`: Primary key
-- `article_id`: Foreign key to articles (unique constraint prevents duplicates)
-- `created_at`: ISO 8601 timestamp with Z suffix (UTC)
-- `narrative_text`: Full interactive story content
+The application uses SQLite to store analysis runs, articles, and generated narratives with automatic schema creation.
 
 ## File Structure
 
 ```
 lede_character/
-├── .env                    # Environment variables (not committed)
-├── .gitignore             # Git ignore rules
-├── LICENSE                # MIT License
+├── .env                  # Environment variables (not committed)
+├── .gitignore            # Git ignore rules
+├── LICENSE               # MIT License
 ├── main.js               # Main analysis pipeline
 ├── helpers.js            # Core utility functions
 ├── database.js           # Database operations and schema
 ├── generateNarrative.js  # Narrative generation script
-├── dailyJob.js          # Automated daily processing
-├── curation-prompt.txt  # AI curation template
-├── narrative-prompt.txt # AI narrative generation template
-├── lede_character.db    # SQLite database (created automatically)
-├── package.json         # Project dependencies
-└── README.md            # This file
+├── curation-prompt.txt   # AI curation template
+├── narrative-prompt.txt  # AI narrative generation template
+├── lede_character.db     # SQLite database (created automatically)
+├── package.json          # Project dependencies
+└── README.md             # This file
 ```
-
-## API Configuration
-
-### NewsAPI Query Parameters
-
-- **Query**: Complex boolean search for autocracy-related terms
-- **Date Range**: Incremental from last analysis run timestamp
-- **Sort**: By popularity
-- **Automatic URL filtering**: Removes example.com, removed.com, etc.
-
-### OpenAI Configuration
-
-- **Model**: `gpt-4-1106-preview`
-- **Curation Temperature**: 0.7 (balanced creativity/consistency)
-- **Narrative Temperature**: 0.85 (high creativity for storytelling)
-- **Max Tokens**: 4,096 (for full narrative generation)
-
-## Environment Variables
-
-| Variable         | Description                                 | Required |
-| ---------------- | ------------------------------------------- | -------- |
-| `NEWS_API_KEY`   | Your NewsAPI key for fetching articles      | Yes      |
-| `OPENAI_API_KEY` | Your OpenAI API key for analysis/narratives | Yes      |
-
-## Narrative Structure
-
-Generated narratives feature:
-
-- **Grounding**: Specific location, time, character identity
-- **Length**: 2,500-3,000 words with exactly 10 decision points
-- **Structure**: 3-act format with escalating tension
-- **Branching**: Multiple paths that reconverge and branch again
-- **Endings**: 3-4 complete endings (300+ words each) based on player choices
-- **Format**: Second-person narrative ("You are...")
 
 ## Cost Considerations
 
@@ -274,15 +179,6 @@ The application includes comprehensive error handling for:
 - Duplicate narrative prevention
 - Invalid article IDs
 - Malformed AI responses
-
-## Rate Limits and Best Practices
-
-Be aware of API rate limits:
-
-- **NewsAPI**: 1,000 requests/month (free tier)
-- **OpenAI**: Varies by plan and model
-- Built-in delays between API calls to avoid rate limiting
-- Incremental fetching reduces API usage
 
 ## Troubleshooting
 
@@ -319,6 +215,13 @@ npm install sqlite3
 - This is normal for paywalled content
 - The application automatically filters these out
 
+### Rate Limits
+
+Be aware of the following API rate limits with the current implementation:
+
+- **NewsAPI**: 1,000 requests/month (free tier)
+- **OpenAI**: Varies by plan and model
+
 ## Development
 
 ### Adding New Features
@@ -341,45 +244,9 @@ node -e "require('./helpers').getMostRecentAnalysisRunTimestamp().then(console.l
 node generateNarrative.js <article_id>
 ```
 
-## Security Notes
-
-- Never commit your `.env` file
-- Rotate API keys regularly
-- Monitor OpenAI usage to avoid unexpected charges
-- Database contains no sensitive personal information
-- All timestamps stored in UTC for consistency
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Test with both analysis and narrative generation workflows
-4. Ensure all environment variables are documented
-5. Submit a pull request with clear description
-
 ## License
 
-MIT License
-
-Copyright (c) 2025 Wendy Dherin
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Future Development Roadmap
 
