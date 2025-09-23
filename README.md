@@ -1,6 +1,6 @@
-# Lede Character - News-to-Narrative Generator
+# Lede Character
 
-A Node.js application that fetches recent news articles about autocracy and democracy decline, analyzes them with AI, and generates immersive choose-your-own-adventure narratives.
+This is an immersive-journalism Node.js app uses OpenAI and ElevenLabs APIs to generate audioscapes of choose your own adventure–style narratives based on real news related to the worldwide decline of democracy.
 
 ## Overview
 
