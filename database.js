@@ -41,5 +41,51 @@ db.serialize(() => {
   `)
 })
 
-// Export the database connection
-module.exports = { db }
+function saveAnalysisRun(totalArticles, acceptedArticles) {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      // Insert analysis run
+      db.run(
+        "INSERT INTO analysis_runs (total_articles, accepted_articles, created_at) VALUES (?, ?, ?)",
+        [totalArticles, acceptedArticles.length, new Date().toISOString()],
+        function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+
+          const runId = this.lastID
+
+          // Insert accepted articles
+          const stmt = db.prepare(`
+            INSERT INTO articles (run_id, title, description, url, author, published_at, source, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `)
+
+          acceptedArticles.forEach((article) => {
+            stmt.run([
+              runId,
+              article.title,
+              article.description,
+              article.url,
+              article.author,
+              article.publishedAt,
+              article.source?.name,
+              new Date().toISOString(),
+            ])
+          })
+
+          stmt.finalize((err) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(runId)
+            }
+          })
+        }
+      )
+    })
+  })
+}
+
+module.exports = { db, saveAnalysisRun }

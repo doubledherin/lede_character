@@ -201,7 +201,7 @@ npm install sqlite3
 **Dotenv logging messages**
 
 - Ensure dotenv is only loaded once in each execution path
-- Use `{ silent: true }` option consistently
+- Use `{ quiet: true }` option consistently
 
 **NewsAPI returns fake URLs**
 
