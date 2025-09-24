@@ -20,7 +20,7 @@ async function main() {
 
     /// Curate articles
     const { acceptedArticles, totalArticles, analysisResponse } =
-      await curateArticles(articles)
+      await curateArticles(limitedArticles)
     console.log(
       `Accepted ${acceptedArticles.length} articles from ${totalArticles} total`
     )

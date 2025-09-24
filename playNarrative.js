@@ -1,94 +1,167 @@
-require("dotenv").config({ quiet: true })
-
+const sqlite3 = require("sqlite3").verbose()
+const fs = require("fs").promises
+const path = require("path")
 const readline = require("readline")
-const { db } = require("./database")
+const { parseNarrativeText, saveNarrativeGraph } = require("./narrativeParser")
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-})
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const DB_PATH = "./lede_character.db"
+const db = new sqlite3.Database(DB_PATH)
 
-function ask(question) {
-  return new Promise((resolve) => rl.question(question, resolve))
+// Function to create readline interface for user input
+function createReadlineInterface() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
 }
 
-async function playNarrative(articleId) {
+// Function to ask user for confirmation
+function askConfirmation(question) {
+  return new Promise((resolve) => {
+    const rl = createReadlineInterface()
+    rl.question(question, (answer) => {
+      rl.close()
+      resolve(
+        answer.toLowerCase().trim() === "y" ||
+          answer.toLowerCase().trim() === "yes"
+      )
+    })
+  })
+}
+
+async function generateNarrative(articleId) {
   return new Promise((resolve, reject) => {
+    // Check if narrative already exists
     db.get(
-      "SELECT narrative_text FROM narratives WHERE article_id = ?",
+      "SELECT id FROM narratives WHERE article_id = ?",
       [articleId],
-      async (err, row) => {
+      async (err, existingNarrative) => {
         if (err) {
           reject(err)
           return
         }
 
-        if (!row) {
-          console.log("No narrative found for this article.")
-          resolve()
-          return
+        if (existingNarrative) {
+          const shouldOverwrite = await askConfirmation(
+            `A narrative already exists for article ${articleId}. Overwrite? (y/n): `
+          )
+
+          if (!shouldOverwrite) {
+            console.log("Narrative generation cancelled.")
+            resolve()
+            return
+          }
+
+          // Delete existing narrative and related data
+          db.serialize(() => {
+            db.run("DELETE FROM choices WHERE narrative_id = ?", [
+              existingNarrative.id,
+            ])
+            db.run("DELETE FROM story_nodes WHERE narrative_id = ?", [
+              existingNarrative.id,
+            ])
+            db.run("DELETE FROM narratives WHERE id = ?", [
+              existingNarrative.id,
+            ])
+          })
         }
 
-        await playStory(row.narrative_text)
-        resolve()
+        // Get the article
+        db.get(
+          "SELECT * FROM articles WHERE id = ?",
+          [articleId],
+          async (err, article) => {
+            if (err) {
+              reject(err)
+              return
+            }
+
+            if (!article) {
+              console.log("Article not found")
+              resolve()
+              return
+            }
+
+            try {
+              console.log(`Generating narrative for: ${article.title}`)
+
+              // Load and prepare prompt
+              const promptPath = path.join(__dirname, "narrative-prompt.txt")
+              let prompt = await fs.readFile(promptPath, "utf8")
+
+              prompt = prompt
+                .replace(/{{articleTitle}}/g, article.title)
+                .replace(/{{articleDescription}}/g, article.description)
+                .replace(
+                  /{{articleContent}}/g,
+                  `${article.title}\n\n${article.description}`
+                )
+
+              // Call OpenAI API
+              const response = await fetch(
+                "https://api.openai.com/v1/chat/completions",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${OPENAI_API_KEY}`,
+                  },
+                  body: JSON.stringify({
+                    model: "gpt-4-1106-preview",
+                    messages: [{ role: "user", content: prompt }],
+                    max_tokens: 4096,
+                    temperature: 0.85,
+                  }),
+                }
+              )
+
+              const data = await response.json()
+              const narrativeText = data.choices[0].message.content
+
+              // Parse the structured narrative
+              const { nodeContents, choiceData } =
+                parseNarrativeText(narrativeText)
+
+              console.log(
+                `Parsed ${nodeContents.length} nodes and ${choiceData.length} choices`
+              )
+
+              // Save to database as graph structure
+              const narrativeId = await saveNarrativeGraph(
+                articleId,
+                article.title,
+                nodeContents,
+                choiceData
+              )
+
+              console.log(`Narrative saved with ID: ${narrativeId}`)
+              resolve(narrativeId)
+            } catch (error) {
+              reject(error)
+            }
+          }
+        )
       }
     )
   })
-}
-
-async function playStory(narrativeText) {
-  console.log("\n" + "=".repeat(60))
-  console.log("🎭 INTERACTIVE NARRATIVE")
-  console.log("=".repeat(60) + "\n")
-
-  // TO DO: Improve prompt to be sure how to create branching structure
-  // Simple parser - look for choice patterns like "1. Option A" or "A) Choice"
-  const sections = narrativeText.split(/(?=\n\n.*?[1-9AB]\.|[1-9AB]\))/g)
-
-  for (let i = 0; i < sections.length; i++) {
-    const section = sections[i].trim()
-
-    // Check if this section has choices
-    const hasChoices = /[1-9AB]\.|[1-9AB]\)/.test(section)
-
-    if (hasChoices) {
-      console.log(section)
-
-      if (i < sections.length - 1) {
-        // Not the last section
-        const choice = await ask("\n👉 Enter your choice: ")
-        console.log(`\nYou chose: ${choice}\n`)
-        console.log("-".repeat(40))
-      }
-    } else {
-      console.log(section)
-
-      if (i < sections.length - 1) {
-        await ask("\n⏎ Press Enter to continue...")
-        console.log()
-      }
-    }
-  }
-
-  console.log("\n" + "=".repeat(60))
-  console.log("🏁 THE END")
-  console.log("=".repeat(60))
 }
 
 async function main() {
   const articleId = process.argv[2]
 
   if (!articleId) {
-    console.log("Usage: node playNarrative.js <articleId>")
+    console.log("Usage: node generateNarrative.js <articleId>")
+    console.log("Example: node generateNarrative.js 5")
     process.exit(1)
   }
 
   try {
-    await playNarrative(parseInt(articleId))
+    await generateNarrative(parseInt(articleId))
   } catch (error) {
-    console.error("Error:", error)
+    console.error("Error generating narrative:", error)
+    process.exit(1)
   } finally {
-    rl.close()
     db.close()
   }
 }

@@ -19,8 +19,6 @@ function getMostRecentAnalysisRunTimestamp() {
     db.get(
       "SELECT created_at FROM analysis_runs ORDER BY created_at DESC LIMIT 1",
       (err, row) => {
-        db.close()
-
         if (err) {
           reject(err)
         } else if (row) {
@@ -102,7 +100,24 @@ async function curateArticles(articles) {
     throw new Error("Missing OPENAI_API_KEY environment variable")
   }
 
+  // Debug: Check what we're working with
+  console.log("📝 Curating", articles.length, "articles")
+  console.log("First article:", articles[0]?.title?.substring(0, 50) + "...")
+
   const prompt = await loadCurationPrompt(articles)
+
+  // Debug: Check prompt length
+  console.log("🔍 Prompt length:", prompt.length, "characters")
+  console.log("🔍 Estimated tokens:", Math.ceil(prompt.length / 4)) // Rough estimate
+
+  if (prompt.length > 15000) {
+    // GPT-4 context limit check
+    console.log("⚠️  WARNING: Prompt might be too long!")
+  }
+
+  // Debug: Show prompt preview
+  console.log("🔍 Prompt preview:")
+  console.log(prompt.substring(0, 500) + "...")
 
   console.log("Using GPT-4 for curation...")
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -118,21 +133,45 @@ async function curateArticles(articles) {
     }),
   })
 
-  const dataAI = await response.json()
+  // Debug the response
+  console.log("API Response Status:", response.status)
+
+  const responseText = await response.text()
+  console.log("Raw response length:", responseText.length)
+  console.log("Raw response preview:", responseText.substring(0, 300) + "...")
+
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.status} - ${responseText}`)
+  }
+
+  // Parse the response
+  let dataAI
+  try {
+    dataAI = JSON.parse(responseText)
+  } catch (error) {
+    console.log("❌ JSON Parse Error - Full response:")
+    console.log(responseText)
+    throw new Error(`Failed to parse OpenAI response as JSON: ${error.message}`)
+  }
+
+  // ADD THIS MISSING CODE:
   const reply = dataAI.choices?.[0]?.message?.content
   if (!reply) {
     throw new Error("No response from AI")
   }
 
-  // Extract JSON from markdown if needed
-  const cleanedReply = extractJSONFromMarkdown(reply)
+  console.log("🤖 AI Response preview:", reply.substring(0, 200) + "...")
 
-  // Parse the JSON response
+  // Extract JSON from the AI's response (it might be in markdown)
+  const jsonString = extractJSONFromMarkdown(reply)
+
   let parsedResponse
   try {
-    parsedResponse = JSON.parse(cleanedReply)
+    parsedResponse = JSON.parse(jsonString)
   } catch (error) {
-    throw new Error("Failed to parse AI response as JSON: " + error.message)
+    console.log("❌ Failed to parse AI response as JSON:")
+    console.log("Raw AI response:", reply)
+    throw new Error(`Failed to parse AI JSON response: ${error.message}`)
   }
 
   // Filter only accepted articles
