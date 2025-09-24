@@ -1,167 +1,178 @@
-const sqlite3 = require("sqlite3").verbose()
-const fs = require("fs").promises
-const path = require("path")
+require("dotenv").config({ silent: true })
 const readline = require("readline")
-const { parseNarrativeText, saveNarrativeGraph } = require("./narrativeParser")
+const { db } = require("./database")
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-const DB_PATH = "./lede_character.db"
-const db = new sqlite3.Database(DB_PATH)
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
 
-// Function to create readline interface for user input
-function createReadlineInterface() {
-  return readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
+function ask(question) {
+  return new Promise((resolve) => rl.question(question, resolve))
 }
 
-// Function to ask user for confirmation
-function askConfirmation(question) {
-  return new Promise((resolve) => {
-    const rl = createReadlineInterface()
-    rl.question(question, (answer) => {
-      rl.close()
-      resolve(
-        answer.toLowerCase().trim() === "y" ||
-          answer.toLowerCase().trim() === "yes"
-      )
-    })
-  })
-}
-
-async function generateNarrative(articleId) {
+async function getStartNode(narrativeId) {
   return new Promise((resolve, reject) => {
-    // Check if narrative already exists
+    // Start node = node with no incoming choices
     db.get(
-      "SELECT id FROM narratives WHERE article_id = ?",
+      `
+      SELECT s.* FROM story_nodes s 
+      WHERE s.narrative_id = ? 
+      AND NOT EXISTS (
+        SELECT 1 FROM choices c WHERE c.child_node_id = s.id
+      )
+    `,
+      [narrativeId],
+      (err, row) => {
+        if (err) reject(err)
+        else resolve(row)
+      }
+    )
+  })
+}
+
+async function getNodeChoices(narrativeId, nodeId) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `
+      SELECT choice_text, choice_order, child_node_id
+      FROM choices 
+      WHERE narrative_id = ? AND parent_node_id = ?
+      ORDER BY choice_order
+    `,
+      [narrativeId, nodeId],
+      (err, rows) => {
+        if (err) reject(err)
+        else resolve(rows)
+      }
+    )
+  })
+}
+
+async function getNode(narrativeId, nodeId) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      `
+      SELECT * FROM story_nodes 
+      WHERE narrative_id = ? AND id = ?
+    `,
+      [narrativeId, nodeId],
+      (err, row) => {
+        if (err) reject(err)
+        else resolve(row)
+      }
+    )
+  })
+}
+
+async function playNarrative(articleId) {
+  return new Promise((resolve, reject) => {
+    // Get narrative for this article
+    db.get(
+      "SELECT * FROM narratives WHERE article_id = ?",
       [articleId],
-      async (err, existingNarrative) => {
+      async (err, narrative) => {
         if (err) {
           reject(err)
           return
         }
 
-        if (existingNarrative) {
-          const shouldOverwrite = await askConfirmation(
-            `A narrative already exists for article ${articleId}. Overwrite? (y/n): `
-          )
-
-          if (!shouldOverwrite) {
-            console.log("Narrative generation cancelled.")
-            resolve()
-            return
-          }
-
-          // Delete existing narrative and related data
-          db.serialize(() => {
-            db.run("DELETE FROM choices WHERE narrative_id = ?", [
-              existingNarrative.id,
-            ])
-            db.run("DELETE FROM story_nodes WHERE narrative_id = ?", [
-              existingNarrative.id,
-            ])
-            db.run("DELETE FROM narratives WHERE id = ?", [
-              existingNarrative.id,
-            ])
-          })
+        if (!narrative) {
+          console.log("No narrative found for this article.")
+          console.log("Run: node generateNarrative.js " + articleId)
+          resolve()
+          return
         }
 
-        // Get the article
-        db.get(
-          "SELECT * FROM articles WHERE id = ?",
-          [articleId],
-          async (err, article) => {
-            if (err) {
-              reject(err)
-              return
-            }
-
-            if (!article) {
-              console.log("Article not found")
-              resolve()
-              return
-            }
-
-            try {
-              console.log(`Generating narrative for: ${article.title}`)
-
-              // Load and prepare prompt
-              const promptPath = path.join(__dirname, "narrative-prompt.txt")
-              let prompt = await fs.readFile(promptPath, "utf8")
-
-              prompt = prompt
-                .replace(/{{articleTitle}}/g, article.title)
-                .replace(/{{articleDescription}}/g, article.description)
-                .replace(
-                  /{{articleContent}}/g,
-                  `${article.title}\n\n${article.description}`
-                )
-
-              // Call OpenAI API
-              const response = await fetch(
-                "https://api.openai.com/v1/chat/completions",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${OPENAI_API_KEY}`,
-                  },
-                  body: JSON.stringify({
-                    model: "gpt-4-1106-preview",
-                    messages: [{ role: "user", content: prompt }],
-                    max_tokens: 4096,
-                    temperature: 0.85,
-                  }),
-                }
-              )
-
-              const data = await response.json()
-              const narrativeText = data.choices[0].message.content
-
-              // Parse the structured narrative
-              const { nodeContents, choiceData } =
-                parseNarrativeText(narrativeText)
-
-              console.log(
-                `Parsed ${nodeContents.length} nodes and ${choiceData.length} choices`
-              )
-
-              // Save to database as graph structure
-              const narrativeId = await saveNarrativeGraph(
-                articleId,
-                article.title,
-                nodeContents,
-                choiceData
-              )
-
-              console.log(`Narrative saved with ID: ${narrativeId}`)
-              resolve(narrativeId)
-            } catch (error) {
-              reject(error)
-            }
-          }
-        )
+        try {
+          await playStory(narrative.id, narrative.title)
+          resolve()
+        } catch (error) {
+          reject(error)
+        }
       }
     )
   })
+}
+
+async function playStory(narrativeId, title) {
+  console.log("\n" + "=".repeat(60))
+  console.log(`🎭 ${title}`)
+  console.log("=".repeat(60) + "\n")
+
+  // Start from the beginning
+  const startNode = await getStartNode(narrativeId)
+  if (!startNode) {
+    console.log("Error: No start node found for this narrative.")
+    return
+  }
+
+  let currentNode = startNode
+  const pathTaken = [currentNode.id]
+
+  while (currentNode) {
+    // Display current node content
+    console.log(currentNode.content)
+    console.log()
+
+    // Get choices for this node
+    const choices = await getNodeChoices(narrativeId, currentNode.id)
+
+    if (choices.length === 0) {
+      // This is an ending
+      console.log("🏁 THE END")
+      console.log("=".repeat(60))
+
+      // Show the path taken
+      console.log(`\nPath taken: ${pathTaken.join(" → ")}`)
+      break
+    }
+
+    // Display choices
+    console.log("What do you do?")
+    choices.forEach((choice, index) => {
+      console.log(`${index + 1}. ${choice.choice_text}`)
+    })
+
+    // Get user choice
+    let selectedChoice = null
+    while (!selectedChoice) {
+      const answer = await ask(
+        "\n👉 Enter your choice (1-" + choices.length + "): "
+      )
+      const choiceNum = parseInt(answer)
+
+      if (choiceNum >= 1 && choiceNum <= choices.length) {
+        selectedChoice = choices[choiceNum - 1]
+      } else {
+        console.log("Invalid choice. Please try again.")
+      }
+    }
+
+    // Move to next node
+    currentNode = await getNode(narrativeId, selectedChoice.child_node_id)
+    pathTaken.push(currentNode.id)
+
+    console.log(`\nYou chose: ${selectedChoice.choice_text}`)
+    console.log("-".repeat(40) + "\n")
+  }
 }
 
 async function main() {
   const articleId = process.argv[2]
 
   if (!articleId) {
-    console.log("Usage: node generateNarrative.js <articleId>")
-    console.log("Example: node generateNarrative.js 5")
+    console.log("Usage: node playNarrative.js <articleId>")
+    console.log("Example: node playNarrative.js 5")
     process.exit(1)
   }
 
   try {
-    await generateNarrative(parseInt(articleId))
+    await playNarrative(parseInt(articleId))
   } catch (error) {
-    console.error("Error generating narrative:", error)
-    process.exit(1)
+    console.error("Error:", error)
   } finally {
+    rl.close()
     db.close()
   }
 }
