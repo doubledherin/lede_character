@@ -169,12 +169,6 @@ The application includes comprehensive error handling for:
 
 ### Common Issues
 
-**"Cannot find module 'sqlite3'"**
-
-```bash
-npm install sqlite3
-```
-
 **"database is locked"**
 
 - Close DB Browser for SQLite before running scripts
@@ -190,11 +184,6 @@ npm install sqlite3
 - Check max_tokens setting (should be 4096)
 - Verify narrative-prompt.txt emphasizes length requirements
 
-**Dotenv logging messages**
-
-- Ensure dotenv is only loaded once in each execution path
-- Use `{ quiet: true }` option consistently
-
 **NewsAPI returns fake URLs**
 
 - This is normal for paywalled content
@@ -208,13 +197,6 @@ Be aware of the following API rate limits with the current implementation:
 - **OpenAI**: Varies by plan and model
 
 ## Development
-
-### Adding New Features
-
-1. **New article sources**: Add to `getRecentArticles()` in helpers.js
-2. **Custom curation logic**: Modify `curateArticles()` function
-3. **Database changes**: Update schema in database.js
-4. **New prompt templates**: Add template files and loading functions
 
 ### Testing
 
