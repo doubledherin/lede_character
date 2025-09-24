@@ -1,25 +1,26 @@
 # Lede Character
 
+This is a WIP; expect the README and codebase to be updated frequently.
+
 ## Overview
 
-This project is an AI-powered immersive journalism platform that uses OpenAI GPT-4 and ElevenLabs APIs to transform real news about democracy's decline into interactive, audio-driven choose-your-own-adventure narratives.
+An AI-powered immersive journalism platform that transforms real news about democracy's decline into interactive, audio-driven choose-your-own-adventure narratives. Using OpenAI GPT-4 for intelligent news curation and narrative generation, with a graph-based story structure designed for future audio integration via ElevenLabs APIs.
+
+Key Features:
+
+- AI-Powered Pipeline: GPT-4 curates news and generates branching narratives
+- Graph-Based Story Engine: Sophisticated node-and-choice structure for complex branching
+- Interactive Playback: Terminal-based choose-your-own-adventure experience
+- Real News Foundation: Stories grounded in actual democracy/autocracy reporting
+- Scalable Architecture: Built for future audio synthesis and voice interaction
 
 ### Current Implementation:
 
-1. Fetch recent news articles about autocracy, fascism, and antidemocratic movements
-2. Analyze which articles would make compelling interactive fiction using OpenAI's GPT-4
-3. Store accepted articles in a SQLite database with analysis run tracking
-4. Generate detailed, branching choose-your-own-adventure narratives based on real news events
-
-### Current Features
-
-- **Smart Incremental Fetching**: Only fetches articles newer than the last analysis run
-- **AI Analysis**: Uses OpenAI's GPT-4 to evaluate narrative potential and filter articles
-- **URL Validation**: Automatically filters out fake URLs (example.com, removed.com, etc.)
-- **Database Storage**: SQLite database to track analysis runs and store accepted articles
-- **Narrative Generation**: Creates 2,500-3,000 word interactive stories with 10 decision points
-- **Overwrite Protection**: Prevents accidental narrative overwrites with confirmation prompts
-- **Template-Based Prompts**: Modular prompt system using external text files
+1. News Curation: Fetch and intelligently filter articles about autocracy and democratic decline
+2. Story Generation: Transform selected articles into branching interactive narratives
+3. Graph Storage: Save stories as interconnected nodes and choices in SQLite database
+4. Interactive Experience: Navigate through stories with real-time choice-based branching
+5. Complete MVP: End-to-end pipeline from news article to playable interactive story on the command line
 
 ### Planned Features:
 
@@ -50,7 +51,7 @@ cd lede_character
 2. Install dependencies:
 
 ```bash
-npm install sqlite3 dotenv node-cron
+npm install sqlite3 dotenv
 ```
 
 3. Get your API keys:
@@ -65,60 +66,49 @@ NEWS_API_KEY=your_newsapi_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
+5. Initialize the DB:
+   This will happen on the first run.
+
 ## Usage
 
-### 1. Run Full Analysis Pipeline
+### Full MVP Demo (Recommended)
 
-To fetch articles, analyze them, and save to database:
+```bash
+# Complete pipeline: fetch → curate → generate → play
+node mvpDemo.js
+```
+
+### Step by Step Usage
+
+1. Fetch and Curate Articles
 
 ```bash
 node main.js
 ```
 
-This will:
+- Fetches recent articles about democracy/autocracy
+- Uses GPT-4 to curate the most narrative-worthy stories
+- Saves results to SQLite database
 
-1. Get the timestamp of the most recent analysis run
-2. Fetch only articles newer than that timestamp (or past month if first run)
-3. Filter out invalid URLs automatically
-4. Send articles to OpenAI for curation analysis
-5. Store accepted articles in the database with run tracking
-
-### 2. Generate Interactive Narratives
-
-To create a choose-your-own-adventure story from a specific article:
+2. Generate Interactive Articles
 
 ```bash
 node generateNarrative.js <articleId>
 ```
 
-Example:
+- Creates a branching choose-your-own-adventure story
+- Uses graph structure with story nodes and choice connections
+- Stores narrative as interconnected database entities
+
+3. Play Interactive Story
 
 ```bash
-node generateNarrative.js 8
+node playNarrative.js <articleId>
 ```
 
-This will:
-
-1. Load the article from the database
-2. Generate a 2,500-3,000 word interactive narrative with 10 decision points
-3. Save the narrative to the database
-4. Prompt for confirmation if a narrative already exists for that article
-
-### 3. Daily Automated Processing
-
-To run automated daily jobs:
-
-```bash
-node dailyJob.js
-```
-
-This starts a cron job that runs daily at 6 AM and:
-
-1. Fetches new articles since the last run
-2. Curates them with AI
-3. Stores accepted articles
-4. Generates narratives for all new articles
-5. Logs all activities for monitoring
+- Interactive terminal-based story experience
+- Navigate through branching narrative with numbered choices
+- Multiple endings based on user decisions
 
 ## Database
 
@@ -127,19 +117,21 @@ The application uses SQLite to store analysis runs, articles, and generated narr
 ## File Structure
 
 ```
+
 lede_character/
-├── .env                  # Environment variables (not committed)
-├── .gitignore            # Git ignore rules
-├── LICENSE               # MIT License
-├── main.js               # Main analysis pipeline
-├── helpers.js            # Core utility functions
-├── database.js           # Database operations and schema
-├── generateNarrative.js  # Narrative generation script
-├── curation-prompt.txt   # AI curation template
-├── narrative-prompt.txt  # AI narrative generation template
-├── lede_character.db     # SQLite database (created automatically)
-├── package.json          # Project dependencies
-└── README.md             # This file
+├── .env # Environment variables (not committed)
+├── .gitignore # Git ignore rules
+├── LICENSE # MIT License
+├── main.js # Main analysis pipeline
+├── helpers.js # Core utility functions
+├── database.js # Database operations and schema
+├── generateNarrative.js # Narrative generation script
+├── curation-prompt.txt # AI curation template
+├── narrative-prompt.txt # AI narrative generation template
+├── lede_character.db # SQLite database (created automatically)
+├── package.json # Project dependencies
+└── README.md # This file
+
 ```
 
 ## Cost Considerations
@@ -247,7 +239,7 @@ Based on the current codebase, here's a comprehensive checklist of remaining fea
 
 ### Phase 1: Core Pipeline Completion
 
-- [ ] **Add `saveAnalysisRun` function** to database.js for storing analysis results
+- [x] **Add `saveAnalysisRun` function** to database.js for storing analysis results
 - [ ] **Implement narrative generation workflow** (currently exists as separate script)
 - [ ] **Add error handling and retry logic** for API failures
 - [ ] **Create daily automation script** with cron job scheduling
@@ -333,3 +325,7 @@ Based on the current codebase, here's a comprehensive checklist of remaining fea
 - [ ] **Add configuration management** for different environments
 - [ ] **Implement proper logging framework** (Winston, etc.)
 - [ ] **Add health checks** and monitoring endpoints
+
+```
+
+```
