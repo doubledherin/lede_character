@@ -110,6 +110,27 @@ node playNarrative.js <articleId>
 - Navigate through branching narrative with numbered choices
 - Multiple endings based on user decisions
 
+## Batch Narrative Generation
+
+```bash
+# Generate narratives for all articles without existing narratives
+node generateAllNarratives.js
+
+# Skip confirmation prompt for large batches
+node generateAllNarratives.js --confirm
+```
+
+**Features:**
+
+- **Smart Article Detection**: Finds articles without existing narratives using LEFT JOIN queries
+- **Cost Estimation**: Shows estimated OpenAI costs before proceeding with batch operations
+- **Rate Limit Handling**: 2-second delays between requests to respect OpenAI API limits
+- **Progress Tracking**: Shows current progress (e.g., [3/10]) and reports success/failure rates
+- **Error Resilience**: Continues processing if individual articles fail, with detailed reporting
+- **Batch Confirmation**: Prompts for confirmation on expensive operations (5+ narratives)
+
+This is especially useful after running `node main.js` to quickly generate interactive stories for all your curated articles.
+
 ## Database
 
 The application uses SQLite to store analysis runs, articles, and generated narratives with automatic schema creation.
@@ -121,16 +142,20 @@ The application uses SQLite to store analysis runs, articles, and generated narr
 lede_character/
 ├── .env # Environment variables (not committed)
 ├── .gitignore # Git ignore rules
-├── LICENSE # MIT License
-├── main.js # Main analysis pipeline
-├── helpers.js # Core utility functions
+├── curation-prompt.txt # AI curation template
 ├── database.js # Database operations and schema
 ├── generateNarrative.js # Narrative generation script
-├── curation-prompt.txt # AI curation template
-├── narrative-prompt.txt # AI narrative generation template
+├── generateAllNarratives.js # Batch narrative generation for all articles
+├── helpers.js # Core utility functions
 ├── lede_character.db # SQLite database (created automatically)
+├── LICENSE # MIT License
+├── main.js # Main analysis pipeline
+├── mvpDemo.js # end-to-end script run
+├── narrative-prompt.txt # AI narrative generation template
 ├── package.json # Project dependencies
+├── playNarrative.js # script for playing the 'game', expects a narrative ID argument in the command line
 └── README.md # This file
+├── resetDatabase.js # run this to wipe out the narrative databases; script has plenty of confirmation prompts to stop you from doing sad things.
 
 ```
 
@@ -222,11 +247,12 @@ Based on the current codebase, here's a comprehensive checklist of remaining fea
 ### Phase 1: Core Pipeline Completion
 
 - [x] **Add `saveAnalysisRun` function** to database.js for storing analysis results
-- [ ] **Implement narrative generation workflow** (currently exists as separate script)
-- [ ] **Add error handling and retry logic** for API failures
+- [x] **Implement narrative generation workflow** with single and batch processing
+- [x] **Add error handling and retry logic** for API failures
+- [x] **Implement duplicate narrative prevention** with user confirmation prompts
+- [x] **Add batch processing capabilities** with cost estimation and progress tracking
 - [ ] **Create daily automation script** with cron job scheduling
 - [ ] **Add logging system** for monitoring pipeline runs
-- [ ] **Implement duplicate narrative prevention** with user confirmation prompts
 
 ### Phase 2: Interactive User Interface
 
