@@ -96,6 +96,15 @@ async function playNarrative(articleId) {
 }
 
 async function playStory(narrativeId, title) {
+  function askQuestion(question) {
+    return new Promise((resolve) => {
+      process.stdout.write(question)
+      process.stdin.once("data", (data) => {
+        resolve(data.toString().trim())
+      })
+    })
+  }
+
   console.log("\n" + "=".repeat(60))
   console.log(`🎭 ${title}`)
   console.log("=".repeat(60) + "\n")
@@ -137,7 +146,7 @@ async function playStory(narrativeId, title) {
     // Get user choice
     let selectedChoice = null
     while (!selectedChoice) {
-      const answer = await ask(
+      const answer = await askQuestion(
         "\n👉 Enter your choice (1-" + choices.length + "): "
       )
       const choiceNum = parseInt(answer)
@@ -175,6 +184,15 @@ async function main() {
     rl.close()
     db.close()
   }
+}
+
+// Add this to the end of playNarrative.js, before the existing main() check
+module.exports = {
+  playStory,
+  playNarrative,
+  getStartNode,
+  getNodeChoices,
+  getNode,
 }
 
 if (require.main === module) {
