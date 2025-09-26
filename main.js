@@ -30,25 +30,18 @@ async function main() {
     console.log(`Analysis run saved with ID: ${runId}`)
 
     // Generate narrative for the first accepted article (MVP scope)
+    // Replace the broken section at the end of main.js with this:
     if (acceptedArticles.length > 0) {
-      console.log("Generating narrative for first article...")
-      const { exec } = require("child_process")
-
-      // Get the article ID from database (you'll need to query for it)
-      const firstArticleId = acceptedArticles[0].id // Assuming you store the ID
-
-      exec(
-        `node generateNarrative.js ${firstArticleId}`,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error("Error generating narrative:", error)
-          } else {
-            console.log("Narrative generated successfully!")
-            console.log(stdout)
-          }
-        }
-      )
+      console.log("\n🎭 TIP: Generate narratives for your new articles:")
+      console.log("  node generateAllNarratives.js")
+      console.log("\n📚 Then browse and play stories:")
+      console.log("  node chooseAndPlay.js")
+    } else {
+      console.log("\n❌ No articles were accepted for narrative generation.")
+      console.log("Try running again later for different news content.")
     }
+
+    console.log(`\n✅ Analysis complete! Run ID: ${runId}`)
   } catch (error) {
     console.error("Pipeline error:", error)
   }
