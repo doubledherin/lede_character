@@ -72,7 +72,27 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ## Usage
 
-### Interactive Story Browser (Recommended)
+### Complete Pipeline (Recommended for Fresh Content)
+
+```bash
+# Run the complete pipeline: fetch → curate → generate
+node runPipeline.js
+
+# Or using npm script
+npm run pipeline
+```
+
+**Features:**
+
+- **Complete Workflow**: Automatically runs article fetching, curation, and narrative generation
+- **Manual Control**: Run when you want fresh content, avoiding unexpected API costs
+- **Error Handling**: Detailed logging and graceful failure recovery
+- **Cost Transparency**: You control exactly when API calls happen
+- **Development Friendly**: Perfect for iterative development and testing
+
+This combines the content creation steps into one command. After running this, use `node chooseAndPlay.js` to browse and play your new narratives.
+
+### Interactive Story Browser (Play Generated Stories)
 
 ```bash
 # Browse and play available narratives with menu selection
@@ -87,11 +107,14 @@ This launches an interactive menu where you can:
 - Return to the menu after completing stories
 - Play multiple stories in one session
 
-### Full MVP Demo
+### Full Workflow Example
 
 ```bash
-# Complete pipeline: fetch → curate → generate → play
-node mvpDemo.js
+# Step 1: Create fresh content
+npm run pipeline
+
+# Step 2: Play the stories
+node chooseAndPlay.js
 ```
 
 ### Step by Step Usage
@@ -175,6 +198,7 @@ lede_character/
 ├── playNarrative.js        # Direct story playback by article ID
 ├── README.md               # This file
 ├── resetDatabase.js        # Database reset utility with confirmation prompts
+├── runPipeline.js          # Complete pipeline runner script
 └── testOpenAI.js           # API connectivity debugging tool
 ```
 
@@ -309,8 +333,9 @@ Based on the current codebase, here's a comprehensive checklist of remaining fea
 - [x] **Implement duplicate narrative prevention** with user confirmation prompts
 - [x] **Add batch processing capabilities** with cost estimation and progress tracking
 - [x] **Build command-line interface** for selecting narratives with menu system
-- [ ] **Create daily automation script** with cron job scheduling
+- [x] **Create complete pipeline script** for manual workflow execution
 - [ ] **Add logging system** for monitoring pipeline runs
+- [ ] **Create deployment automation** with cron job scheduling (future)
 
 ### Phase 2: Enhanced User Experience
 
