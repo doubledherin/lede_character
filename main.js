@@ -4,6 +4,7 @@ const {
   getMostRecentAnalysisRunTimestamp,
   getRecentArticles,
   curateArticles,
+  deduplicateArticles,
 } = require("./helpers")
 const { saveAnalysisRun } = require("./database")
 
@@ -14,15 +15,17 @@ async function main() {
     console.log("Most Recent Analysis Run Timestamp:", timestamp)
 
     /// Get recent articles
-    const { articles } = await getRecentArticles()
-    const limitedArticles = articles.slice(0, 10) // Reduced for MVP purposes
-    console.log(`Processing ${limitedArticles.length} articles`)
+    const { articles } = await getRecentArticles(timestamp)
+
+    /// Deduplicate full list first, then limit, so we always process up to 10 unique articles
+    const uniqueArticles = deduplicateArticles(articles).slice(0, 10)
+    console.log(`✅ Processing ${uniqueArticles.length} unique articles`)
 
     /// Curate articles
     const { acceptedArticles, totalArticles, analysisResponse } =
-      await curateArticles(limitedArticles)
+      await curateArticles(uniqueArticles)
     console.log(
-      `Accepted ${acceptedArticles.length} articles from ${totalArticles} total`
+      `Accepted ${acceptedArticles.length} articles from ${totalArticles} total`,
     )
 
     // Save analysis run

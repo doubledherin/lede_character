@@ -9,6 +9,7 @@ An AI-powered immersive journalism platform that transforms real news about demo
 Key Features:
 
 - AI-Powered Pipeline: GPT-4 curates news and generates branching narratives
+- Intelligent Deduplication: Advanced article deduplication prevents duplicate stories
 - Graph-Based Story Engine: Sophisticated node-and-choice structure for complex branching
 - Interactive Menu System: Browse and select stories from an intuitive CLI interface
 - Terminal-Based Gameplay: Full choose-your-own-adventure experience with branching narratives
@@ -18,10 +19,11 @@ Key Features:
 ### Current Implementation:
 
 1. News Curation: Fetch and intelligently filter articles about autocracy and democratic decline
-2. Story Generation: Transform selected articles into branching interactive narratives
-3. Graph Storage: Save stories as interconnected nodes and choices in SQLite database
-4. Interactive Story Browser: Menu-driven interface to select and play available narratives
-5. Complete MVP: End-to-end pipeline from news article to playable interactive story on the command line
+2. Article Deduplication: Multi-strategy deduplication removes duplicate articles before processing
+3. Story Generation: Transform selected articles into branching interactive narratives
+4. Graph Storage: Save stories as interconnected nodes and choices in SQLite database
+5. Interactive Story Browser: Menu-driven interface to select and play available narratives
+6. Complete MVP: End-to-end pipeline from news article to playable interactive story on the command line
 
 ### Planned Features:
 
@@ -56,7 +58,6 @@ npm install sqlite3 dotenv
 ```
 
 3. Get your API keys:
-
    - **NewsAPI**: Sign up at [newsapi.org](https://newsapi.org/) for a free API key
    - **OpenAI**: Get your API key from [platform.openai.com](https://platform.openai.com/)
 
@@ -126,6 +127,7 @@ node main.js
 ```
 
 - Fetches recent articles about democracy/autocracy
+- Applies intelligent deduplication to remove duplicate articles
 - Uses GPT-4 to curate the most narrative-worthy stories
 - Saves results to SQLite database
 
@@ -207,6 +209,7 @@ lede_character/
 ### ✅ Completed MVP Features
 
 - **Complete MVP Pipeline**: End-to-end news → interactive story generation
+- **Intelligent Article Deduplication**: Multi-strategy deduplication using URL matching, title similarity, and content fingerprinting
 - **Interactive Story Browser**: Menu-driven interface to select and play narratives
 - **Graph-Based Story Structure**: Sophisticated node-and-choice database architecture
 - **Terminal-Based Gameplay**: Full choose-your-own-adventure experience

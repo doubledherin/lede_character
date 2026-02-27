@@ -26,7 +26,7 @@ function askConfirmation(question) {
       rl.close()
       resolve(
         answer.toLowerCase().trim() === "y" ||
-          answer.toLowerCase().trim() === "yes"
+          answer.toLowerCase().trim() === "yes",
       )
     })
   })
@@ -46,7 +46,7 @@ async function generateNarrative(articleId) {
 
         if (existingNarrative) {
           const shouldOverwrite = await askConfirmation(
-            `A narrative already exists for article ${articleId}. Overwrite? (y/n): `
+            `A narrative already exists for article ${articleId}. Overwrite? (y/n): `,
           )
 
           if (!shouldOverwrite) {
@@ -97,7 +97,7 @@ async function generateNarrative(articleId) {
                 .replace(/{{articleDescription}}/g, article.description)
                 .replace(
                   /{{articleContent}}/g,
-                  `${article.title}\n\n${article.description}`
+                  `${article.title}\n\n${article.description}`,
                 )
 
               // Call OpenAI API
@@ -115,7 +115,7 @@ async function generateNarrative(articleId) {
                     max_tokens: 4096,
                     temperature: 0.85,
                   }),
-                }
+                },
               )
 
               const data = await response.json()
@@ -126,7 +126,7 @@ async function generateNarrative(articleId) {
                 parseNarrativeText(narrativeText)
 
               console.log(
-                `Parsed ${nodeContents.length} nodes and ${choiceData.length} choices`
+                `Parsed ${nodeContents.length} nodes and ${choiceData.length} choices`,
               )
 
               // Save to database as graph structure
@@ -134,7 +134,7 @@ async function generateNarrative(articleId) {
                 articleId,
                 article.title,
                 nodeContents,
-                choiceData
+                choiceData,
               )
 
               console.log(`Narrative saved with ID: ${narrativeId}`)
@@ -142,9 +142,9 @@ async function generateNarrative(articleId) {
             } catch (error) {
               reject(error)
             }
-          }
+          },
         )
-      }
+      },
     )
   })
 }
