@@ -287,7 +287,7 @@ The application includes comprehensive error handling for:
 
 **Short narratives despite prompt requirements**
 
-- Check max_completion_tokens setting (should be 4096)
+- Check max_tokens setting (should be 4096)
 - Verify narrative-prompt.txt emphasizes length requirements
 
 **NewsAPI returns fake URLs**
