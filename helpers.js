@@ -1,7 +1,6 @@
 const path = require("path")
 const fs = require("fs").promises
-
-const { db } = require("./database")
+const { db, getExistingArticleFingerprints } = require("./database")
 
 /**
  * Retrieves the timestamp of the most recent analysis run from the local SQLite database.
@@ -338,21 +337,35 @@ function getRunDetails(runId) {
  * Uses multiple strategies to catch near-duplicates and republished content.
  *
  * @param {Array<Object>} articles - Array of article objects with url, title, description
- * @returns {Array<Object>} Deduplicated array of articles
+ * @returns {Promise<Array<Object>>} Deduplicated array of articles
  * @example
- * const uniqueArticles = deduplicateArticles(allArticles);
+ * const uniqueArticles = await deduplicateArticles(allArticles);
  * console.log(`Removed ${allArticles.length - uniqueArticles.length} duplicates`);
  */
-function deduplicateArticles(articles) {
+async function deduplicateArticles(articles) {
   if (!articles || articles.length === 0) {
     return articles
   }
 
   console.log(`\n🔍 Deduplicating ${articles.length} articles...`)
 
-  const uniqueArticles = []
+  // Pre-populate seen sets with fingerprints from previous runs
+  const existingRows = await getExistingArticleFingerprints()
   const seenUrls = new Set()
   const seenTitleHashes = new Set()
+  for (const row of existingRows) {
+    if (row.url) seenUrls.add(row.url)
+    const hash = generateTitleHash(row.title)
+    if (hash) seenTitleHashes.add(hash)
+  }
+
+  if (existingRows.length > 0) {
+    console.log(
+      `   📚 Loaded ${existingRows.length} existing articles from DB for cross-run deduplication`,
+    )
+  }
+
+  const uniqueArticles = []
   let duplicateCount = 0
 
   for (const article of articles) {

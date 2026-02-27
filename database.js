@@ -131,4 +131,16 @@ function saveAnalysisRun(totalArticles, acceptedArticles) {
   })
 }
 
-module.exports = { db, saveAnalysisRun }
+function getExistingArticleFingerprints() {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT url, title FROM articles", (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows || [])
+      }
+    })
+  })
+}
+
+module.exports = { db, saveAnalysisRun, getExistingArticleFingerprints }
