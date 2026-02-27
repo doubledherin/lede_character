@@ -5,12 +5,12 @@ function runCommand(command, args = []) {
   return new Promise((resolve, reject) => {
     console.log(`🚀 Running: ${command} ${args.join(" ")}`)
 
-    const process = spawn(command, args, {
+    const proc = spawn(command, args, {
       stdio: "inherit", // Shows real-time output
       cwd: __dirname,
     })
 
-    process.on("close", (code) => {
+    proc.on("close", (code) => {
       if (code === 0) {
         resolve()
       } else {
@@ -18,7 +18,7 @@ function runCommand(command, args = []) {
       }
     })
 
-    process.on("error", (error) => {
+    proc.on("error", (error) => {
       reject(error)
     })
   })
@@ -55,5 +55,5 @@ async function runDailyPipeline() {
 // Just run once and exit
 runDailyPipeline().then(() => {
   console.log("🏁 Daily automation script finished")
-  process.exit(0)
+  proc.exit(0)
 })
