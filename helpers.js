@@ -1,8 +1,6 @@
 const path = require("path")
 const fs = require("fs").promises
-
 const { db, getExistingArticleFingerprints } = require("./database")
-const { time } = require("console")
 
 /**
  * Retrieves the timestamp of the most recent analysis run from the local SQLite database.
@@ -70,7 +68,7 @@ async function getRecentArticles(timestamp) {
     'autocracy OR autocratic OR antidemocratic OR fascist OR fascism OR far-right OR "far right" OR authoritarian OR authoritarianism OR dictatorship OR totalitarianism OR populism OR populist OR demagogue OR demagoguery OR demagogy OR demagogic OR autocrat OR autocratic OR despotism OR despot OR tyrant OR tyranny'
 
   if (timestamp) {
-    console.log("Fetching articles since:", timestamp.toISOString())
+    console.log("Fetching articles since:", timestamp)
   } else {
     console.log("Fetching articles from past month")
   }
@@ -499,7 +497,5 @@ module.exports = {
   saveAnalysisRun,
   getRecentRuns,
   getRunDetails,
-
-  extractJSONFromMarkdown,
   deduplicateArticles,
 }
