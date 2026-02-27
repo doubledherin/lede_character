@@ -18,8 +18,8 @@ async function main() {
     const { articles } = await getRecentArticles(timestamp)
     const limitedArticles = articles.slice(0, 10) // Reduced for MVP purposes
 
-    /// Deduplicate articles before processing
-    const uniqueArticles = deduplicateArticles(limitedArticles)
+    /// Deduplicate articles before processing (checks DB for cross-run duplicates)
+    const uniqueArticles = await deduplicateArticles(limitedArticles)
     console.log(`✅ Processing ${uniqueArticles.length} unique articles`)
 
     /// Curate articles
