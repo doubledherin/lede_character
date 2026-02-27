@@ -18,7 +18,7 @@ async function getAllArticlesWithoutNarratives() {
       (err, rows) => {
         if (err) reject(err)
         else resolve(rows)
-      }
+      },
     )
   })
 }
@@ -32,24 +32,24 @@ async function loadNarrativePrompt(article) {
     template = template.replace(/{{articleTitle}}/g, article.title || "")
     template = template.replace(
       /{{articleDescription}}/g,
-      article.description || ""
+      article.description || "",
     )
     template = template.replace(
       /{{articleContent}}/g,
-      `Title: ${article.title}\nDescription: ${article.description}\nURL: ${article.url}`
+      `Title: ${article.title}\nDescription: ${article.description}\nURL: ${article.url}`,
     )
 
     return template
   } catch (error) {
     throw new Error(
-      `Failed to load narrative prompt template: ${error.message}`
+      `Failed to load narrative prompt template: ${error.message}`,
     )
   }
 }
 
 async function generateNarrativeForArticle(article) {
   console.log(
-    `\n📝 Generating narrative for: "${article.title.substring(0, 60)}..."`
+    `\n📝 Generating narrative for: "${article.title.substring(0, 60)}..."`,
   )
 
   try {
@@ -76,9 +76,8 @@ async function generateNarrativeForArticle(article) {
     }
 
     const data = await response.json()
-    console.log("data", data)
     const narrativeText = data.choices[0].message.content
-    console.log("narrativeText", narrativeText)
+
     console.log("📊 Parsing narrative structure...")
     const { nodeContents, choiceData } = parseNarrativeText(narrativeText)
 
@@ -94,7 +93,7 @@ async function generateNarrativeForArticle(article) {
       article.id,
       article.title,
       nodeContents,
-      choiceData
+      choiceData,
     )
 
     console.log("✅ Narrative generated successfully!")
@@ -125,8 +124,8 @@ async function main() {
       console.log(
         `   ${index + 1}. [ID:${article.id}] ${article.title.substring(
           0,
-          80
-        )}...`
+          80,
+        )}...`,
       )
     })
 
@@ -135,8 +134,8 @@ async function main() {
       console.log(`\n⚠️  This will generate ${articles.length} narratives.`)
       console.log(
         `💰 Estimated cost: $${(articles.length * 0.2).toFixed(
-          2
-        )} (approx $0.20 per narrative)`
+          2,
+        )} (approx $0.20 per narrative)`,
       )
 
       // Simple confirmation - you could make this interactive
@@ -144,7 +143,7 @@ async function main() {
         process.argv.includes("--confirm") || process.argv.includes("-y")
       if (!confirm) {
         console.log(
-          "\nAdd --confirm or -y flag to proceed automatically, or Ctrl+C to cancel."
+          "\nAdd --confirm or -y flag to proceed automatically, or Ctrl+C to cancel.",
         )
         console.log("Example: node generateAllNarratives.js --confirm")
 
@@ -163,7 +162,7 @@ async function main() {
     for (let i = 0; i < articles.length; i++) {
       const article = articles[i]
       console.log(
-        `\n[${i + 1}/${articles.length}] Processing article ${article.id}`
+        `\n[${i + 1}/${articles.length}] Processing article ${article.id}`,
       )
 
       const success = await generateNarrativeForArticle(article)
@@ -189,7 +188,7 @@ async function main() {
     console.log(`❌ Failed: ${failureCount}`)
     console.log(`📜 Failed Article IDs: ${failureIds.join(", ")}`)
     console.log(
-      `📈 Success Rate: ${((successCount / articles.length) * 100).toFixed(1)}%`
+      `📈 Success Rate: ${((successCount / articles.length) * 100).toFixed(1)}%`,
     )
 
     if (successCount > 0) {

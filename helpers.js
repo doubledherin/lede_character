@@ -26,7 +26,7 @@ function getMostRecentAnalysisRunTimestamp() {
         } else {
           resolve(null) // No analysis runs found
         }
-      }
+      },
     )
   })
 }
@@ -78,7 +78,7 @@ async function getRecentArticles(timestamp) {
     timestamp ||
     new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString()
   const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
-    query
+    query,
   )}&from=${from}&sortBy=popularity&apiKey=${encodeURIComponent(apiKey)}`
   const response = await fetch(url)
   if (!response.ok) {
@@ -87,7 +87,7 @@ async function getRecentArticles(timestamp) {
   const data = await response.json()
   if (data.articles) {
     data.articles = data.articles.filter((article) =>
-      isValidArticleUrl(article.url)
+      isValidArticleUrl(article.url),
     )
   }
 
@@ -101,8 +101,9 @@ async function curateArticles(articles) {
   }
 
   // Debug: Check what we're working with
-  console.log("📝 Curating", articles.length, "articles")
-  console.log("First article:", articles[0]?.title?.substring(0, 50) + "...")
+  console.log()
+  console.log("\n📝 Curating", articles.length, "articles")
+  console.log("\n\nFirst article:", articles[0]?.title)
 
   const prompt = await loadCurationPrompt(articles)
 
@@ -116,7 +117,7 @@ async function curateArticles(articles) {
   }
 
   // Debug: Show prompt preview
-  console.log("🔍 Prompt preview:")
+  console.log("\n\n🔍 Prompt preview:")
   console.log(prompt.substring(0, 500) + "...")
 
   console.log("Using GPT-4 for curation...")
@@ -177,12 +178,12 @@ async function curateArticles(articles) {
   // Filter only accepted articles
   const acceptedArticles = articles.filter((_, index) =>
     parsedResponse.acceptedArticles.some(
-      (accepted) => accepted.index === index + 1
-    )
+      (accepted) => accepted.index === index + 1,
+    ),
   )
 
   console.log(
-    `Curated! Filtered ${acceptedArticles.length} accepted articles from ${articles.length} total`
+    `Curated! Filtered ${acceptedArticles.length} accepted articles from ${articles.length} total`,
   )
 
   return {
@@ -300,7 +301,7 @@ function getRecentRuns(limit = 10) {
       (err, rows) => {
         if (err) reject(err)
         else resolve(rows)
-      }
+      },
     )
   })
 }
@@ -326,11 +327,153 @@ function getRunDetails(runId) {
           (err, articles) => {
             if (err) reject(err)
             else resolve({ run, articles })
-          }
+          },
         )
-      }
+      },
     )
   })
+}
+
+/**
+ * Deduplicates articles based on URL, title similarity, and content fingerprinting.
+ * Uses multiple strategies to catch near-duplicates and republished content.
+ *
+ * @param {Array<Object>} articles - Array of article objects with url, title, description
+ * @returns {Array<Object>} Deduplicated array of articles
+ * @example
+ * const uniqueArticles = deduplicateArticles(allArticles);
+ * console.log(`Removed ${allArticles.length - uniqueArticles.length} duplicates`);
+ */
+function deduplicateArticles(articles) {
+  if (!articles || articles.length === 0) {
+    return articles
+  }
+
+  console.log(`\n🔍 Deduplicating ${articles.length} articles...`)
+
+  const uniqueArticles = []
+  const seenUrls = new Set()
+  const seenTitleHashes = new Set()
+  let duplicateCount = 0
+
+  for (const article of articles) {
+    let isDuplicate = false
+
+    // Strategy 1: Exact URL match (most reliable)
+    if (article.url && seenUrls.has(article.url)) {
+      isDuplicate = true
+    }
+
+    // Strategy 2: Title similarity (catch republished content)
+    const titleHash = generateTitleHash(article.title)
+    if (titleHash && seenTitleHashes.has(titleHash)) {
+      isDuplicate = true
+    }
+
+    // Strategy 3: Content fingerprinting for near-duplicates
+    if (!isDuplicate && article.description) {
+      const contentFingerprint = generateContentFingerprint(article.description)
+      const similarArticle = uniqueArticles.find((existing) => {
+        const existingFingerprint = generateContentFingerprint(
+          existing.description || "",
+        )
+        return (
+          calculateSimilarity(contentFingerprint, existingFingerprint) > 0.85
+        )
+      })
+
+      if (similarArticle) {
+        isDuplicate = true
+      }
+    }
+
+    if (isDuplicate) {
+      duplicateCount++
+      console.log(`   ❌ Duplicate: "${article.title?.substring(0, 60)}..."`)
+    } else {
+      uniqueArticles.push(article)
+      if (article.url) seenUrls.add(article.url)
+      if (titleHash) seenTitleHashes.add(titleHash)
+    }
+  }
+
+  console.log(
+    `✅ Deduplication complete: ${uniqueArticles.length} unique, ${duplicateCount} duplicates removed`,
+  )
+  return uniqueArticles
+}
+
+/**
+ * Generates a normalized hash for article titles to catch similar headlines
+ */
+function generateTitleHash(title) {
+  if (!title || typeof title !== "string") return null
+
+  // Normalize: lowercase, remove punctuation, excess whitespace
+  const normalized = title
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+
+  // Create simple hash
+  let hash = 0
+  for (let i = 0; i < normalized.length; i++) {
+    const char = normalized.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+
+  return hash.toString()
+}
+
+/**
+ * Generates a content fingerprint for similarity comparison
+ */
+function generateContentFingerprint(content) {
+  if (!content || typeof content !== "string") return []
+
+  // Extract key words (longer than 3 chars, common words)
+  const words = content
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 3)
+    .filter(
+      (word) =>
+        ![
+          "this",
+          "that",
+          "with",
+          "from",
+          "they",
+          "have",
+          "will",
+          "been",
+          "said",
+          "were",
+          "more",
+          "than",
+          "other",
+        ].includes(word),
+    )
+    .slice(0, 20) // Take first 20 meaningful words
+
+  return words
+}
+
+/**
+ * Calculates similarity between two content fingerprints
+ */
+function calculateSimilarity(fingerprint1, fingerprint2) {
+  if (fingerprint1.length === 0 || fingerprint2.length === 0) return 0
+
+  const set1 = new Set(fingerprint1)
+  const set2 = new Set(fingerprint2)
+  const intersection = new Set([...set1].filter((x) => set2.has(x)))
+  const union = new Set([...set1, ...set2])
+
+  return intersection.size / union.size // Jaccard similarity
 }
 
 module.exports = {
@@ -342,5 +485,7 @@ module.exports = {
   saveAnalysisRun,
   getRecentRuns,
   getRunDetails,
+
   extractJSONFromMarkdown,
+  deduplicateArticles,
 }
